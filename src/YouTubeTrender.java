@@ -1,5 +1,6 @@
 import entity.YouTubeVideo;
 import exception.YouTubeDataParserException;
+import service.TrendingTopicAnalyzer;
 import service.YouTubeDataParser;
 
 import javax.json.Json;
@@ -7,7 +8,9 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class YouTubeTrender {
 
@@ -47,9 +50,54 @@ public class YouTubeTrender {
         }
     }
 
+    public static void test3() {
+        System.out.println("Performing Test 3: Sorting videos by view count");
+        String filename = "data/youtubedata_loremipsum.json";
+
+        try {
+            YouTubeDataParser parser = new YouTubeDataParser();
+            List<YouTubeVideo> list = parser.parseFromFile(filename);
+
+            // Sort the videos by view count
+            Collections.sort(list);
+
+            // Print the sorted videos
+            for (YouTubeVideo video : list) {
+                System.out.println(video.getTitle() + " - " + video.getViewCount() + " views");
+            }
+        } catch (YouTubeDataParserException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void test4() {
+        System.out.println("Performing Test 4: Indexing word usage for trending topics");
+        String filename = "data/youtubedata_loremipsum.json";
+
+        try {
+            YouTubeDataParser parser = new YouTubeDataParser();
+            List<YouTubeVideo> list = parser.parseFromFile(filename);
+
+            TrendingTopicAnalyzer analyzer = new TrendingTopicAnalyzer();
+            Map<String, Integer> wordCountMap = analyzer.indexWordUsage(list);
+
+            // Print the indexed words and their counts
+            for (Map.Entry<String, Integer> entry : wordCountMap.entrySet()) {
+                System.out.println(entry.getKey() + ": " + entry.getValue());
+            }
+        } catch (YouTubeDataParserException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
     public static void main(String[] args) throws FileNotFoundException {
         System.out.println("YouTube Trender Application");
-        test1();
-        test2();
+        // test1();
+        // test2();
+        System.out.println("OKOKOKOKOK");
+        test3();
+        test4();
     }
 }

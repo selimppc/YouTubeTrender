@@ -3,7 +3,7 @@ package entity;
 /**
  * Represents a YouTube video with various attributes.
  */
-public class YouTubeVideo {
+public class YouTubeVideo implements Comparable<YouTubeVideo> {
     private String channelId;
     private String channelTitle;
     private String publishedAt; // You can use java.util.Date or java.time.LocalDate based on your needs
@@ -64,6 +64,17 @@ public class YouTubeVideo {
 
     public void setViewCount(long viewCount) {
         this.viewCount = viewCount;
+    }
+
+    /**
+     * Do Compare YouTube videos based on view count.
+     * @param video as YouTubeVideo
+     * @return integer
+     */
+    @Override
+    public int compareTo(YouTubeVideo video) {
+        // Sort by view count in descending order
+        return Long.compare(video.viewCount, this.viewCount);
     }
 }
 
