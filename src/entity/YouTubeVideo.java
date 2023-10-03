@@ -1,45 +1,28 @@
 package entity;
 
-/**
- * Represents a YouTube video with various attributes.
- */
-public class YouTubeVideo implements Comparable<YouTubeVideo> {
-    private String channelId;
-    private String channelTitle;
-    private String publishedAt; // You can use java.util.Date or java.time.LocalDate based on your needs
+
+public class YouTubeVideo {
+    private String channel;
+    private String date;
     private String title;
     private String description;
-    private long viewCount;
+    private int viewCount;
+    private String id;
 
-    public YouTubeVideo() {}
-
-    /**
-     * Gets the channel ID of the video.
-     * @return the channel ID.
-     */
-    public String getChannelId() {
-        return channelId;
+    public String getChannel() {
+        return channel;
     }
 
-
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 
-    public String getChannelTitle() {
-        return channelTitle;
+    public String getDate() {
+        return date;
     }
 
-    public void setChannelTitle(String channelTitle) {
-        this.channelTitle = channelTitle;
-    }
-
-    public String getPublishedAt() {
-        return publishedAt;
-    }
-
-    public void setPublishedAt(String publishedAt) {
-        this.publishedAt = publishedAt;
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public String getTitle() {
@@ -58,23 +41,20 @@ public class YouTubeVideo implements Comparable<YouTubeVideo> {
         this.description = description;
     }
 
-    public long getViewCount() {
+    public int getViewCount() {
         return viewCount;
     }
 
-    public void setViewCount(long viewCount) {
+    public void setViewCount(int viewCount) {
         this.viewCount = viewCount;
     }
 
-    /**
-     * Do Compare YouTube videos based on view count.
-     * @param video as YouTubeVideo
-     * @return integer
-     */
     @Override
-    public int compareTo(YouTubeVideo video) {
-        // Sort by view count in descending order
-        return Long.compare(video.viewCount, this.viewCount);
+    public String toString() {
+        return "YoutubeVideo [channel=" + channel + ", date=" + date + ", title=" + title + ", description=" + description
+                + ", viewCount=" + viewCount + ", id=" + id + "]";
     }
+
 }
+
 
