@@ -137,7 +137,6 @@ public class YouTubeTrender {
 
 
     public static void main(String[] args) {
-        System.out.println("YouTube Trender Application");
         test1();
         test2();
         test3();
