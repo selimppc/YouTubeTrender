@@ -2,53 +2,43 @@ import comparator.YouTubeVideoChannelComparator;
 import comparator.YouTubeVideoDateComparator;
 import comparator.YouTubeVideoViewComparator;
 import comparator.YoutubeVideoDescriptionComparator;
+import entity.WordInfo;
 import entity.YouTubeVideo;
 import exception.YouTubeDataParserException;
 import service.TrendingTopicAnalyzer;
 import service.YouTubeDataParser;
-import service.YouTubeVideoIndexer;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Scanner;
 
 public class YouTubeTrender {
 
+    private static Scanner scanner = new Scanner(System.in);
+
     public static void test1() {
         System.out.println("Performing Test 1");
-        String filename = "data/youtubedata_15_50.json";
-        int expectedSize = 50;
-
-        System.out.println("Testing the file: " + filename);
-        System.out.println("Expecting size of: " + expectedSize);
+        System.out.print("Enter the absolute path of the JSON file: ");
+        String filename = scanner.nextLine();
 
         try {
             YouTubeDataParser parser = new YouTubeDataParser();
             List<YouTubeVideo> list = parser.parse(filename);
             System.out.println("Size of input: " + list.size());
-            System.out.println("Success: " + (expectedSize == list.size()));
+
+            System.out.print("Want to print the output (Y/N): ");
+            char printChoice = scanner.nextLine().charAt(0);
+            if (printChoice == 'Y' || printChoice == 'y') {
+                for (YouTubeVideo video : list) {
+                    System.out.println(video.getTitle());
+                }
+            }
+
         } catch (YouTubeDataParserException e) {
-            e.printStackTrace();
+            System.out.println("Error parsing the file: " + e.getMessage());
         }
     }
 
-    public static void test2() {
-        System.out.println("Performing Test 2");
-        String filename = "data/youtubedata_loremipsum.json";
-        int expectedSize = 10;
-
-        System.out.println("Testing the file: " + filename);
-        System.out.println("Expecting size of: " + expectedSize);
-
-        try {
-            YouTubeDataParser parser = new YouTubeDataParser();
-            List<YouTubeVideo> list = parser.parse(filename);
-            System.out.println("Found size: " + list.size());
-        } catch (YouTubeDataParserException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void test3() {
+    public static void test2(int sortChoice) {
         System.out.println("Performing Test 3: Sorting videos by different properties");
         String filename = "data/youtubedata_loremipsum.json";
 
@@ -56,32 +46,29 @@ public class YouTubeTrender {
             YouTubeDataParser parser = new YouTubeDataParser();
             List<YouTubeVideo> list = parser.parse(filename);
 
-            // Sort the videos by number of views using the YouTubeVideoViewComparator
-            list.sort(new YouTubeVideoViewComparator());
-            System.out.println("Sorted by views:");
-            for (YouTubeVideo video : list) {
-                System.out.println(video.getTitle() + " - " + video.getViewCount() + " views");
+            switch (sortChoice) {
+                case 1 -> list.sort(new YouTubeVideoChannelComparator());
+                case 2 -> list.sort(new YouTubeVideoDateComparator());
+                case 3 -> list.sort(new YouTubeVideoViewComparator());
+                case 4 -> list.sort(new YoutubeVideoDescriptionComparator());
+                default -> {
+                    System.out.println("Invalid sorting choice.");
+                    return;
+                }
             }
 
-            // Sort by channel title using the YouTubeVideoChannelComparator
-            list.sort(new YouTubeVideoChannelComparator());
-            System.out.println("\nSorted by channel title:");
-            for (YouTubeVideo video : list) {
-                System.out.println(video.getTitle() + " - " + video.getTitle());
-            }
-
-            // Sort by date using the YouTubeVideoDateComparator
-            list.sort(new YouTubeVideoDateComparator());
-            System.out.println("\nSorted by date:");
-            for (YouTubeVideo video : list) {
-                System.out.println(video.getDate() + " - " + video.getTitle());
-            }
-
-            // Sort by description using the YouTubeVideoDescriptionComparator
-            list.sort(new YoutubeVideoDescriptionComparator());
-            System.out.println("\nSorted by description length:");
-            for (YouTubeVideo video : list) {
-                System.out.println(video.getDescription().length() + " - " + video.getTitle());
+            System.out.print("View sorted result (Y/N): ");
+            char viewChoice = scanner.nextLine().charAt(0);
+            if (viewChoice == 'Y' || viewChoice == 'y') {
+                switch (sortChoice) {
+                    case 1 -> System.out.println("\n== Sorted by channel title: ==");
+                    case 2 -> System.out.println("\n== Sorted by published date: ==");
+                    case 3 -> System.out.println("\n== Sorted by views: ==");
+                    case 4 -> System.out.println("\n== Sorted by description length: ==");
+                }
+                for (YouTubeVideo video : list) {
+                    System.out.println(video.getTitle());
+                }
             }
 
         } catch (YouTubeDataParserException e) {
@@ -89,7 +76,8 @@ public class YouTubeTrender {
         }
     }
 
-    public static void test4() {
+
+    public static void test3() {
         System.out.println("Performing Test 4: Indexing word usage for trending topics");
         String filename = "data/youtubedata_loremipsum.json";
 
@@ -98,49 +86,136 @@ public class YouTubeTrender {
             List<YouTubeVideo> list = parser.parse(filename);
 
             TrendingTopicAnalyzer analyzer = new TrendingTopicAnalyzer();
-            Map<String, Integer> wordCountMap = analyzer.indexWordUsage(list);
+            analyzer.indexWordUsage(list);
 
-            // Print the indexed words and their counts
-            for (Map.Entry<String, Integer> entry : wordCountMap.entrySet()) {
-                System.out.println(entry.getKey() + ": " + entry.getValue());
+            while (true) {
+                System.out.println("\nAnalyze Trending Topics:");
+                System.out.println("1. Find word and its count");
+                System.out.println("2. Find all videos that use a specific word");
+                System.out.println("3. Find the word that is used the most");
+                System.out.println("4. Display list of words sorted by their counts");
+                System.out.println("5. Back to Main Menu");
+                System.out.print("Enter your choice: ");
+
+                int choice = getUserChoice(1, 5);
+                switch (choice) {
+                    case 1:
+                        System.out.print("Enter the word: ");
+                        String word = scanner.nextLine();
+                        WordInfo wordInfo = analyzer.getWordInfo(word);
+                        if (wordInfo != null) {
+                            System.out.println("Count of '" + word + "': " + wordInfo.getCount());
+                        } else {
+                            System.out.println("Word not found.");
+                        }
+                        break;
+                    case 2:
+                        displayVideosForWord(analyzer);  // Use the refactored method here
+                        break;
+                    case 3:
+                        String mostUsedWord = analyzer.getMostUsedWord();
+                        System.out.println("The most used word is: " + mostUsedWord);
+                        break;
+                    case 4:
+                        List<String> sortedWords = analyzer.getSortedWordsByCount();
+                        System.out.println("Words sorted by their counts:");
+                        for (String sortedWord : sortedWords) {
+                            System.out.println(sortedWord + ": " + analyzer.getWordInfo(sortedWord).getCount());
+                        }
+                        break;
+                    case 5:
+                        return;  // Back to Main Menu
+                }
             }
-
-            // Use the YouTubeVideoIndexer to demonstrate its functionality
-            YouTubeVideoIndexer indexer = new YouTubeVideoIndexer();
-
-            // Index the videos
-            indexer.index(list);
-
-            // Retrieve word counts using the indexer
-            System.out.println("\nWord Counts using YouTubeVideoIndexer:");
-            Map<String, Integer> indexerWordCounts = indexer.getWordCounts();
-            for (Map.Entry<String, Integer> entry : indexerWordCounts.entrySet()) {
-                System.out.println(entry.getKey() + ": " + entry.getValue());
-            }
-
-            // Get videos associated with a specific word
-            String wordToSearch = "example"; // Replace with any word you want to search for
-            List<YouTubeVideo> videosWithWord = indexer.getVideosAssociatedWithWord(wordToSearch);
-            System.out.println("\nVideos containing the word '" + wordToSearch + "':");
-            for (YouTubeVideo video : videosWithWord) {
-                System.out.println(video.getTitle());
-            }
-
-            // Find the most used word
-            String mostUsedWord = indexer.getMostUsedWord();
-            System.out.println("\nThe most used word is: " + mostUsedWord);
-
         } catch (YouTubeDataParserException e) {
             e.printStackTrace();
         }
     }
 
 
+
+
     public static void main(String[] args) {
-        test1();
-        test2();
-        test3();
-        test4();
+        while (true) {
+            displayMainMenu();
+            int mainChoice = getUserChoice(1, 4);
+
+            switch (mainChoice) {
+                case 1 -> test1();
+                case 2 -> {
+                    while (true) {
+                        displaySortMenu();
+                        int sortChoice = getUserChoice(1, 5);
+
+                        if (sortChoice == 5) {
+                            break;  // Exit the sorting menu
+                        }
+                        test2(sortChoice);  // Modify test3 to accept an argument for sorting choice
+                    }
+                }
+                case 3 -> test3();
+                case 4 -> {
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+                }
+                default -> System.out.println("Unexpected error occurred.");
+            }
+        }
     }
+
+
+    private static void displayVideosForWord(TrendingTopicAnalyzer analyzer) {
+        System.out.print("Enter the word: ");
+        String word = scanner.nextLine();
+        WordInfo wordInfo = analyzer.getWordInfo(word);
+        if (wordInfo != null) {
+            System.out.println("Videos containing the word '" + word + "':");
+            for (YouTubeVideo video : wordInfo.getVideos()) {
+                System.out.println(video.getTitle());
+            }
+        } else {
+            System.out.println("Word not found.");
+        }
+    }
+
+    private static int getUserChoice(int min, int max) {
+        int choice;
+        while (true) {
+            try {
+                choice = Integer.parseInt(scanner.nextLine());
+                if (choice >= min && choice <= max) {
+                    return choice;
+                } else {
+                    System.out.println("Invalid choice. Please enter a number between " + min + " and " + max + ".");
+                    System.out.print("Enter your choice: ");  // Prompt the user again for their choice
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+                System.out.print("Enter your choice: ");  // Prompt the user again for their choice
+            }
+        }
+    }
+
+
+    private static void displayMainMenu() {
+        System.out.println("\nYoutube Trender Menu:");
+        System.out.println("1. Load Youtube data from File");
+        System.out.println("2. Sort Videos");
+        System.out.println("3. Analyze Trending Topics");
+        System.out.println("4. Exit");
+        System.out.print("Enter your choice: ");
+    }
+
+    private static void displaySortMenu() {
+        System.out.println("\nSort Videos:");
+        System.out.println("1. Sort by Channel Title");
+        System.out.println("2. Sort by Published Date");
+        System.out.println("3. Sort by View Count");
+        System.out.println("4. Sort by Description Length");
+        System.out.println("5. Back to Main Menu");
+        System.out.print("Enter your sorting choice: ");
+    }
+
 }
 
