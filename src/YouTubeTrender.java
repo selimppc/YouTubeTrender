@@ -14,12 +14,14 @@ import java.util.Scanner;
 public class YouTubeTrender {
 
     private static Scanner scanner = new Scanner(System.in);
+    private static String filename;
+
+    public static void inputYouTubeData() {
+        System.out.print("Enter the absolute path of the JSON file: ");
+        filename = scanner.nextLine();
+    }
 
     public static void test1() {
-        System.out.println("Performing Test 1");
-        System.out.print("Enter the absolute path of the JSON file: ");
-        String filename = scanner.nextLine();
-
         try {
             YouTubeDataParser parser = new YouTubeDataParser();
             List<YouTubeVideo> list = parser.parse(filename);
@@ -35,13 +37,11 @@ public class YouTubeTrender {
 
         } catch (YouTubeDataParserException e) {
             System.out.println("Error parsing the file: " + e.getMessage());
+            filename = null;
         }
     }
 
     public static void test2(int sortChoice) {
-        System.out.println("Performing Test 3: Sorting videos by different properties");
-        String filename = "data/youtubedata_loremipsum.json";
-
         try {
             YouTubeDataParser parser = new YouTubeDataParser();
             List<YouTubeVideo> list = parser.parse(filename);
@@ -78,9 +78,6 @@ public class YouTubeTrender {
 
 
     public static void test3() {
-        System.out.println("Performing Test 4: Indexing word usage for trending topics");
-        String filename = "data/youtubedata_loremipsum.json";
-
         try {
             YouTubeDataParser parser = new YouTubeDataParser();
             List<YouTubeVideo> list = parser.parse(filename);
@@ -101,7 +98,7 @@ public class YouTubeTrender {
                 switch (choice) {
                     case 1:
                         System.out.print("Enter the word: ");
-                        String word = scanner.nextLine();
+                        String word = scanner.nextLine().toUpperCase();
                         WordInfo wordInfo = analyzer.getWordInfo(word);
                         if (wordInfo != null) {
                             System.out.println("Count of '" + word + "': " + wordInfo.getCount());
@@ -138,23 +135,27 @@ public class YouTubeTrender {
     public static void main(String[] args) {
         while (true) {
             displayMainMenu();
-            int mainChoice = getUserChoice(1, 4);
+            int mainChoice = getUserChoice(1, 5);
+            if ((mainChoice == 2 || mainChoice == 3 || mainChoice == 4) && filename == null) {
+                System.out.println("You must input the YouTube data file path first.");
+                inputYouTubeData();
+            }
 
             switch (mainChoice) {
-                case 1 -> test1();
-                case 2 -> {
+                case 1 -> inputYouTubeData();
+                case 2 -> test1();
+                case 3 -> {
                     while (true) {
                         displaySortMenu();
                         int sortChoice = getUserChoice(1, 5);
-
                         if (sortChoice == 5) {
                             break;  // Exit the sorting menu
                         }
-                        test2(sortChoice);  // Modify test3 to accept an argument for sorting choice
+                        test2(sortChoice);
                     }
                 }
-                case 3 -> test3();
-                case 4 -> {
+                case 4 -> test3();
+                case 5 -> {
                     System.out.println("Exiting...");
                     scanner.close();
                     return;
@@ -197,15 +198,16 @@ public class YouTubeTrender {
         }
     }
 
-
     private static void displayMainMenu() {
         System.out.println("\nYoutube Trender Menu:");
-        System.out.println("1. Load Youtube data from File");
-        System.out.println("2. Sort Videos");
-        System.out.println("3. Analyze Trending Topics");
-        System.out.println("4. Exit");
+        System.out.println("1. Input Youtube data from File");
+        System.out.println("2. Parse data from the File");
+        System.out.println("3. Sort Videos");
+        System.out.println("4. Analyze Trending Topics");
+        System.out.println("5. Exit");
         System.out.print("Enter your choice: ");
     }
+
 
     private static void displaySortMenu() {
         System.out.println("\nSort Videos:");

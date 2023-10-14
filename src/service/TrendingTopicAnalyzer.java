@@ -15,8 +15,8 @@ public class TrendingTopicAnalyzer {
 
     public Map<String, Integer> indexWordUsage(List<YouTubeVideo> videos) {
         for (YouTubeVideo video : videos) {
-            indexWordsFromText(video.getTitle(), video);
-            indexWordsFromText(video.getDescription(), video);
+            indexWordsFromText(video.getTitle().toUpperCase(), video);
+            indexWordsFromText(video.getDescription().toUpperCase(), video);
         }
 
         Map<String, Integer> wordCountMap = new HashMap<>();

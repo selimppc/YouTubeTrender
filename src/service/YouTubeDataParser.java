@@ -35,7 +35,8 @@ public class YouTubeDataParser {
                 videos.add(video);
             }
         } catch (Exception e) {
-            throw new YouTubeDataParserException("Error parsing YouTube data", e);
+            // System.out.println("ERROR " + e);
+            throw new YouTubeDataParserException("'" + filename + "'", e);
         }
         return videos;
     }
