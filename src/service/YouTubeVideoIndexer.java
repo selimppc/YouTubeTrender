@@ -45,12 +45,12 @@ public class YouTubeVideoIndexer {
         return wordCountMap;
     }
 
-    public List<YouTubeVideo> getVideosAssociatedWithWord(String word) {
+    public Set<YouTubeVideo> getVideosAssociatedWithWord(String word) {
         YoutTubeWordItem wordItem = words.get(word.toLowerCase());
         if (wordItem != null) {
-            return (List<YouTubeVideo>) wordItem.getVideos();
+            return wordItem.getVideos();
         }
-        return new ArrayList<>(); // Return empty list if word not found
+        return new HashSet<>(); // Return empty list if word not found
     }
 
     public String getMostUsedWord() {
