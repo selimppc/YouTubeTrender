@@ -13,15 +13,19 @@ import java.util.Scanner;
 
 public class YouTubeTrender {
 
-    private static Scanner scanner = new Scanner(System.in);
-    private static String filename;
+    protected Scanner scanner;
+    protected String filename;
 
-    public static void inputYouTubeData() {
+    public YouTubeTrender(Scanner scanner) {
+        this.scanner = scanner;
+    }
+
+    protected void inputYouTubeData() {
         System.out.print("Enter the absolute path of the JSON file: ");
         filename = scanner.nextLine();
     }
 
-    public static void test1() {
+    protected void test1() {
         try {
             YouTubeDataParser parser = new YouTubeDataParser();
             List<YouTubeVideo> list = parser.parse(filename);
@@ -41,7 +45,7 @@ public class YouTubeTrender {
         }
     }
 
-    public static void test2(int sortChoice) {
+    protected void test2(int sortChoice) {
         try {
             YouTubeDataParser parser = new YouTubeDataParser();
             List<YouTubeVideo> list = parser.parse(filename);
@@ -77,7 +81,7 @@ public class YouTubeTrender {
     }
 
 
-    public static void test3() {
+    protected void test3() {
         try {
             YouTubeDataParser parser = new YouTubeDataParser();
             List<YouTubeVideo> list = parser.parse(filename);
@@ -130,9 +134,7 @@ public class YouTubeTrender {
     }
 
 
-
-
-    public static void main(String[] args) {
+    public void run() {
         while (true) {
             displayMainMenu();
             int mainChoice = getUserChoice(1, 5);
@@ -165,10 +167,9 @@ public class YouTubeTrender {
         }
     }
 
-
-    private static void displayVideosForWord(TrendingTopicAnalyzer analyzer) {
+    protected void displayVideosForWord(TrendingTopicAnalyzer analyzer) {
         System.out.print("Enter the word: ");
-        String word = scanner.nextLine();
+        String word = scanner.nextLine().trim();  // Ensure the word is read correctly
         WordInfo wordInfo = analyzer.getWordInfo(word);
         if (wordInfo != null) {
             System.out.println("Videos containing the word '" + word + "':");
@@ -180,25 +181,33 @@ public class YouTubeTrender {
         }
     }
 
-    private static int getUserChoice(int min, int max) {
+
+    protected int getUserChoice(int min, int max) {
         int choice;
-        while (true) {
+        int attempts = 0;
+        int maxAttempts = 3;  // Set a maximum number of attempts
+
+        while (attempts < maxAttempts) {
             try {
-                choice = Integer.parseInt(scanner.nextLine());
+                choice = Integer.parseInt(scanner.nextLine().trim());
                 if (choice >= min && choice <= max) {
                     return choice;
                 } else {
                     System.out.println("Invalid choice. Please enter a number between " + min + " and " + max + ".");
-                    System.out.print("Enter your choice: ");  // Prompt the user again for their choice
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid number.");
+            }
+            attempts++;
+            if (attempts < maxAttempts) {
                 System.out.print("Enter your choice: ");  // Prompt the user again for their choice
             }
         }
+        throw new RuntimeException("Maximum number of attempts reached.");
     }
 
-    private static void displayMainMenu() {
+
+    protected void displayMainMenu() {
         System.out.println("\nYoutube Trender Menu:");
         System.out.println("1. Input Youtube data from File");
         System.out.println("2. Parse data from the File");
@@ -209,7 +218,7 @@ public class YouTubeTrender {
     }
 
 
-    private static void displaySortMenu() {
+    protected void displaySortMenu() {
         System.out.println("\nSort Videos:");
         System.out.println("1. Sort by Channel Title");
         System.out.println("2. Sort by Published Date");
@@ -217,6 +226,12 @@ public class YouTubeTrender {
         System.out.println("4. Sort by Description Length");
         System.out.println("5. Back to Main Menu");
         System.out.print("Enter your sorting choice: ");
+    }
+
+
+    public static void main(String[] args) {
+        YouTubeTrender trender = new YouTubeTrender(new Scanner(System.in));
+        trender.run();
     }
 
 }
